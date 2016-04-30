@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# NAME
+#   ptouch - touch with mkdir
+#
+# SYNOPSIS
+#   ptouch [-e] filepath
+# 
+# DESCRIPTION
+#
+#   This command invoke `touch` command. If intermediate directories don't
+#   exist, all the directories are created.
+#
+#   -e Editor option. Open `filepath` file by editor which are specified by
+#      $EDITOR environment variable.
+#
+# RETURN VALUE
+#  0 Successful completion
+#  1 Usage error
+#
+################################################################################
+USAGE="Usage: ptouch [-e] filepath"
+DIR=
+OPEN=FALSE
+OPT=
+
+
+while getopts e OPT
+do
+    case $OPT in
+        e)   OPEN=TRUE
+             ;;
+        \?)  echo $USAGE 1>&2
+             exit 1
+             ;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+if [ $# -ne 1 ]; then
+    echo $USAGE 1>&2
+    exit 1
+fi
+
+DIR=`dirname $1`
+mkdir -p $DIR
+touch $1
+
+if [ "$OPEN" = "TRUE" ]; then
+    $EDITOR $1
+fi
+
+exit 0
